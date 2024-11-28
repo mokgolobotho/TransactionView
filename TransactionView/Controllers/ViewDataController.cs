@@ -17,6 +17,14 @@ public class ViewDataController : Controller
         _db = db;
     }
 
+    public IActionResult Index()
+    {
+        List<AdminTransactionsEntity> transactions = _db.admin_transactions.ToList();
+        List<CecEmployeeEntity> employees = _db.cec_employee.ToList();
+        var data = new List<object> { transactions, employees };
+        return View(data);
+    }
+
     [HttpPost]
     public IActionResult UploadFile(IFormFile file)
     {

@@ -1,0 +1,104 @@
+@model List<object>
+<head>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://qa.miinsightsapps.net/Scripts/plugins/jQuery/jquery-2.2.3.min.js"></script>
+    <script src="https://qa.miinsightsapps.net/Scripts/bootstrap-multiselect.js"></script>
+
+    <link rel="stylesheet" href="https://qa.miinsightsapps.net/Content/Site.css">
+    <link rel="stylesheet" href="https://qa.miinsightsapps.net/Content/bootstrap/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css">
+    <link rel="stylesheet" href="https://qa.miinsightsapps.net/Content/dist/css/AdminLTE.css">
+    <link rel="stylesheet" href="https://qa.miinsightsapps.net/Content/dist/css/skins/_all-skins.css">
+    <link rel="stylesheet" href="https://qa.miinsightsapps.net/Scripts/plugins/jvectormap/jquery-jvectormap-1.2.2.css">
+    <link rel="stylesheet" href="https://qa.miinsightsapps.net/Scripts/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.min.css">
+    <link rel="stylesheet" href="https://qa.miinsightsapps.net/Content/loader.css">
+    <link rel="stylesheet" href="https://qa.miinsightsapps.net/Content/listree.min.css">
+
+</head>
+<body>
+    <h1>Transactions</h1>
+
+    <div style="margin: 0px; padding: 0px; height: auto; max-height: 970px; overflow-y: auto;margin-bottom:30px" class="item">
+        <div class="container">
+            <div style="margin-bottom: 10px;">
+                <input type="text" id="searchInput" placeholder="Search Transactions" style="padding: 5px; width: 300px; margin-right: 10px;">
+                <input type="text" id="cecClientIdFilter" placeholder="Filter by cec_client_id" style="padding: 5px; width: 200px; margin-right: 10px;">
+                <input type="text" id="policyReferenceFilter" placeholder="Filter by Policy Reference" style="padding: 5px; width: 200px;">
+            </div>
+
+            <table id="transactionsTable" class="table table-hover table table-striped table-advance">
+                <thead>
+                    <tr style="background-color: #1a2226; color: #ebf2f6;">
+                        <th>Transaction By</th>
+                        <th>Transaction Name</th>
+                        <th>Changed Value</th>
+                        <th>Changed To</th>
+                        <th>Timestamp</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+            </table>
+
+            <script>
+                $(document).ready(function () {
+                    const data = @Html.Raw(Json.Serialize(Model));
+
+                    const transactions = data[0];
+                    const employees = data[1];
+
+                    function populateTable(filteredTransactions) {
+                        var tableBody = $('#transactionsTable tbody');
+                        tableBody.empty();
+
+                        $.each(filteredTransactions, function (index, transaction) {
+                            var employee = employees.find(emp => emp.cecEmployeeId === transaction.transaction_by);
+
+                            var row = `
+                                <tr>
+                                    <td>${employee ? employee.name : 'N/A'} ${employee ? employee.surname : 'N/A'}</td>
+                                    <td>${transaction.transaction_name}</td>
+                                    <td>${transaction.changed_value || ''}</td>
+                                    <td>${transaction.changed_to || ''}</td>
+                                    <td>${new Date(transaction.timestamp).toLocaleString()}</td>
+                                </tr>
+                            `;
+                            tableBody.append(row);
+                        });
+                    }
+
+                    populateTable(transactions);
+
+                    $(document).ready(function(){
+                        $("#searchInput").on("keyup", function() {
+                            var value = $(this).val().toLowerCase();
+                            $("#transactionsTable tbody tr").filter(function() {
+                            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                            });
+                        });
+                        populateTable(filteredTransactions);
+                    });
+
+                    $('#cecClientIdFilter').on('keyup', function () {
+                        var clientIdTerm = $(this).val().toLowerCase();
+                        var filteredTransactions = transactions.filter(function (transaction) {
+                            return transaction.cec_client_id.toString().includes(clientIdTerm);
+                        });
+                        populateTable(filteredTransactions);
+                    });
+
+                    $('#policyReferenceFilter').on('keyup', function () {
+                        var policyTerm = $(this).val().toLowerCase();
+                        var filteredTransactions = transactions.filter(function (transaction) {
+                            return transaction.policy_reference.toLowerCase().includes(policyTerm);
+                        });
+                        populateTable(filteredTransactions);
+                    });
+                });
+            </script>
+        </div>
+    </div>
+
+</body>
