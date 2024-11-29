@@ -14,5 +14,25 @@
 
 <div class="text-center">
     <h3>View Table</h3>
-    <a class="nav-link text-dark" asp-area="" asp-controller="ViewData" asp-action="Index">Home</a>
+    <form method="post" asp-controller="ViewData" asp-action="Index">
+        <table>
+            <tr>
+                <td>
+                    Cec Client Id
+                </td>
+                <td>
+                    <input type="text" id="cecClientId" name="cecClientId" placeholder="Enter client cec client id"/>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Policy Reference
+                </td>
+                <td>
+                    <input type="text" id="policyReference" name="policyReference" placeholder="Enter client policy reference"/>
+                </td>
+            </tr>
+        </table>
+        <button type="submit" class="btn btn-primary mt-4">Filter</button>
+    </form>
 </div>

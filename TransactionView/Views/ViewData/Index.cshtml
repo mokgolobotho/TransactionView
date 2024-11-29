@@ -23,8 +23,6 @@
         <div class="container">
             <div style="margin-bottom: 10px;">
                 <input type="text" id="searchInput" placeholder="Search Transactions" style="padding: 5px; width: 300px; margin-right: 10px;">
-                <input type="text" id="cecClientIdFilter" placeholder="Filter by cec_client_id" style="padding: 5px; width: 200px; margin-right: 10px;">
-                <input type="text" id="policyReferenceFilter" placeholder="Filter by Policy Reference" style="padding: 5px; width: 200px;">
             </div>
 
             <table id="transactionsTable" class="table table-hover table table-striped table-advance">
@@ -81,21 +79,7 @@
                         populateTable(filteredTransactions);
                     });
 
-                    $('#cecClientIdFilter').on('keyup', function () {
-                        var clientIdTerm = $(this).val().toLowerCase();
-                        var filteredTransactions = transactions.filter(function (transaction) {
-                            return transaction.cec_client_id.toString().includes(clientIdTerm);
-                        });
-                        populateTable(filteredTransactions);
-                    });
 
-                    $('#policyReferenceFilter').on('keyup', function () {
-                        var policyTerm = $(this).val().toLowerCase();
-                        var filteredTransactions = transactions.filter(function (transaction) {
-                            return transaction.policy_reference.toLowerCase().includes(policyTerm);
-                        });
-                        populateTable(filteredTransactions);
-                    });
                 });
             </script>
         </div>

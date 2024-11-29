@@ -17,12 +17,50 @@ public class ViewDataController : Controller
         _db = db;
     }
 
+    [HttpPost]
     public IActionResult Index()
     {
-        List<AdminTransactionsEntity> transactions = _db.admin_transactions.ToList();
-        List<CecEmployeeEntity> employees = _db.cec_employee.ToList();
-        var data = new List<object> { transactions, employees };
+        int cecClientId = -1;
+        try
+        {
+            cecClientId = int.Parse(Request.Form["cecClientId"]);
+        }
+        catch (FormatException e) { }
+        var policyReference = Request.Form["policyReference"];
+        var data = filterTransactions(cecClientId, policyReference);
         return View(data);
+    }
+
+    private List<object> filterTransactions(int cecClientId, string policyReference)
+    {
+        List<AdminTransactionsEntity> transactions = new List<AdminTransactionsEntity>();
+        List<CecEmployeeEntity> employees = _db.cec_employee.ToList();
+        if (cecClientId > -1 && !string.IsNullOrWhiteSpace(policyReference))
+        {
+            transactions = _db
+                .admin_transactions.Where(x =>
+                    x.cec_client_id == cecClientId && x.policy_reference == policyReference
+                )
+                .ToList();
+        }
+        else
+        {
+            if (cecClientId > -1)
+            {
+                transactions = _db
+                    .admin_transactions.Where(x => x.cec_client_id == cecClientId)
+                    .ToList();
+            }
+            else if (!string.IsNullOrWhiteSpace(policyReference))
+            {
+                transactions = _db
+                    .admin_transactions.Where(x => x.policy_reference == policyReference)
+                    .ToList();
+            }
+        }
+        var data = new List<object> { transactions, employees };
+        //Console.WriteLine(employees[0]);
+        return data;
     }
 
     [HttpPost]
