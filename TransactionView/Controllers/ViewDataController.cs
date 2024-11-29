@@ -59,7 +59,7 @@ public class ViewDataController : Controller
             }
         }
         var data = new List<object> { transactions, employees };
-        //Console.WriteLine(employees[0]);
+
         return data;
     }
 
