@@ -20,12 +20,15 @@ public class ViewDataController : Controller
     [HttpPost]
     public IActionResult Index()
     {
-        int cecClientId = -1;
+        int cecClientId = 0;
         try
         {
             cecClientId = int.Parse(Request.Form["cecClientId"]);
         }
-        catch (FormatException e) { }
+        catch (FormatException e)
+        {
+            return View("Index");
+        }
         var policyReference = Request.Form["policyReference"];
         var data = filterTransactions(cecClientId, policyReference);
         return View(data);
@@ -35,7 +38,7 @@ public class ViewDataController : Controller
     {
         List<AdminTransactionsEntity> transactions = new List<AdminTransactionsEntity>();
         List<CecEmployeeEntity> employees = _db.cec_employee.ToList();
-        if (cecClientId > -1 && !string.IsNullOrWhiteSpace(policyReference))
+        if (cecClientId != null && !string.IsNullOrWhiteSpace(policyReference))
         {
             transactions = _db
                 .admin_transactions.Where(x =>
@@ -43,21 +46,7 @@ public class ViewDataController : Controller
                 )
                 .ToList();
         }
-        else
-        {
-            if (cecClientId > -1)
-            {
-                transactions = _db
-                    .admin_transactions.Where(x => x.cec_client_id == cecClientId)
-                    .ToList();
-            }
-            else if (!string.IsNullOrWhiteSpace(policyReference))
-            {
-                transactions = _db
-                    .admin_transactions.Where(x => x.policy_reference == policyReference)
-                    .ToList();
-            }
-        }
+
         var data = new List<object> { transactions, employees };
 
         return data;
